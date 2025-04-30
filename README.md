@@ -8,3 +8,4 @@
 
 ## Skill
 * C++
+* GNU Make
