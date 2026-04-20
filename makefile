@@ -6,7 +6,7 @@ APPLYDIR = application
 
 OBJS =  $(BUILDDIR)/main.o \
 
-TARGET = GhostLeg.exe
+TARGET = Uniqueptr
 
 all: main
 
