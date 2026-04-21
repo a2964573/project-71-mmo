@@ -20,11 +20,13 @@
 - **Artifact:** `day1_unique_ptr_example.cpp`
 
 ### [Day 2] Shared Ownership & Multi-threading Foundation (Upcoming)
-- **Goal:** 여러 모듈이 객체의 생명주기를 공유해야 하는 서버 환경 이해.
-- **Concepts:**
-  - `std::shared_ptr`와 참조 카운팅(Reference Counting)의 내부 동작.
-  - `use_count()`를 이용한 객체 소멸 타이밍 추적.
-  - `weak_ptr`를 이용한 순환 참조(Circular Reference) 방지 기초.
+### [Day 2] Shared Ownership & Reference Counting (2026-04-21)
+- **Focus:** 다중 스레드/다중 모듈 환경을 대비한 메모리 생명주기 공유 시스템 구축.
+- **Key Learnings:**
+  - `std::shared_ptr`를 활용한 객체 상태 공유 메커니즘 구현 (`Monster` 클래스 설계).
+  - Scope(스코프) 진입 및 탈출에 따른 `use_count()`(참조 카운트) 증감 논리 직접 검증. 카운트가 0이 되는 순간에만 메모리가 해제됨을 확인하여, 멀티스레드 환경에서의 메모리 누수 방지 원리 체득.
+  - **Code Refactoring (C ? Modern C++):** C언어의 수동 메모리 해제 습관 탈피. 소멸자(`~Destructor`) 내부의 무의미한 멤버 변수 초기화 로직을 제거하고, 객체 생성 시 선언부 초기화를 강제하여 서버의 불필요한 연산 낭비 차단.
+- **Artifact:** `day2_shared_ptr_monster.cpp`
 
 ---
 

@@ -1,23 +1,39 @@
 #include "main.h"
 
-class Car
+class Monster
 {
 	public:
-		int pos = 0;
+		std::string name;
+		int pos;
 
-		Car()
+		Monster()
 		{
-			std::cout << "New Car!" << std::endl;
+			std::cout << "Monster Create!" << std::endl;
+			name = "";
+			pos = 0;
 		}
 
-		~Car()
+		~Monster()
 		{
-			std::cout << "Destroy Car..." << std::endl;
+			std::cout << "Destroy Monster...." << std::endl;
+			name = "";
+			pos = 0;
+		}
+
+		void setMonsterName(std::string val)
+		{
+			name = val;
+			std::cout << "My Name is " << name << "." << std::endl;
+		}
+
+		std::string getMonsterName()
+		{
+			return name;
 		}
 
 		void moving()
 		{
-			std::cout << "Moving the Car : " << (pos + 1) << std::endl;
+			std::cout << "Moving the Monster: " << (pos + 1) << std::endl;
 			pos++;
 		}
 };
@@ -25,17 +41,27 @@ class Car
 
 int main(int argc, char *argv[])
 {
+	std::cout << "--- [Main Scope Start] ---" << std::endl;
 	{
-		auto mycar = std::make_unique<Car>();
-		mycar->moving();
+		auto orc = std::make_shared<Monster>();
+		orc->setMonsterName("orc");
+		std::cout << "ref cnt after create '" << orc->getMonsterName() << "'. [" << orc.use_count() << "]" << std::endl;
 
-		auto newcar = std::move(mycar);
-		newcar->moving();
+		{
+			std::cout << "    --- [Inner Scope Start] ---" << std::endl;
 
-		if(mycar == nullptr) {
-			std::cerr << "mycar is empty..." << std::endl;
+			auto orc2 = orc;
+			std::cout << "    ref cnt after copy orc2. [" << orc2.use_count() << "]" << "[" << orc.use_count() << "]" << std::endl;
+
+			orc2->moving();
+
+			std::cout << "    --- [Inner Scope End  ] ---" << std::endl;
 		}
+
+		std::cout << "ref cnt after escape Inner Scope. [" << orc.use_count() << "]" << std::endl;
+		orc->moving();
 	}
+	std::cout << "--- [Main Scope End  ] ---" << std::endl;
 
 	return 0;
 }
