@@ -19,7 +19,6 @@
   - **Troubleshooting:** 소유권 이전 후 기존 포인터 접근 시 발생하는 `Segmentation Fault`를 확인하며, C++의 런타임 안전 메커니즘을 역설적으로 체득.
 - **Artifact:** `day1_unique_ptr_example.cpp`
 
-### [Day 2] Shared Ownership & Multi-threading Foundation (Upcoming)
 ### [Day 2] Shared Ownership & Reference Counting (2026-04-21)
 - **Focus:** 다중 스레드/다중 모듈 환경을 대비한 메모리 생명주기 공유 시스템 구축.
 - **Key Learnings:**
