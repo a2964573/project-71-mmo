@@ -27,6 +27,15 @@
   - **Code Refactoring (C ? Modern C++):** C언어의 수동 메모리 해제 습관 탈피. 소멸자(`~Destructor`) 내부의 무의미한 멤버 변수 초기화 로직을 제거하고, 객체 생성 시 선언부 초기화를 강제하여 서버의 불필요한 연산 낭비 차단.
 - **Artifact:** `day2_shared_ptr_monster.cpp`
 
+### [Day 3] Circular Reference & std::weak_ptr (2026-04-23)
+- **Focus:** `shared_ptr` 순환 참조에 의한 메모리 누수(Memory Leak) 진단 및 `weak_ptr`를 이용한 해결.
+- **Key Learnings:**
+  - **순환 참조(Circular Reference) 매커니즘:** 두 객체가 서로를 강하게 참조할 때 참조 카운트가 0이 되지 않아 발생하는 '좀비 메모리' 현상을 코드로 직접 재현 및 확인.
+  - **std::weak_ptr의 전략적 활용:** 객체를 소유하지 않고 관찰만 함으로써 참조 카운트 증가를 억제하고 순환 고리를 끊어냄.
+  - **안전한 객체 접근 (lock & expired):** `weak_ptr`를 `shared_ptr`로 일시적 승격(`lock()`)하여 멀티스레드 환경에서도 안전하게 객체 생존 여부를 검증하고 데이터에 접근하는 실무 패턴 숙지.
+  - **Refactoring:** 소멸자 내 불필요한 초기화(C 스타일)를 완전히 제거하고, C++의 자동 메모리 관리 철학에 집중.
+- **Artifact:** `day3_weak_ptr_circular_fix.cpp`
+
 ---
 
 ## Tech Stack (Evolution)

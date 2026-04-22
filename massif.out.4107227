@@ -1,0 +1,88 @@
+desc: (none)
+cmd: ./application/Uniqueptr
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=4251728
+mem_heap_B=73728
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=4255373
+mem_heap_B=74752
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=4262274
+mem_heap_B=74816
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=4277606
+mem_heap_B=74880
+mem_heap_extra_B=32
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=4290406
+mem_heap_B=74880
+mem_heap_extra_B=32
+mem_stacks_B=0
+heap_tree=peak
+n3: 74880 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 73728 0x4E9423D: pool (eh_alloc.cc:235)
+  n1: 73728 0x4E9423D: UnknownInlinedFun (eh_alloc.cc:373)
+   n1: 73728 0x4E9423D: _GLOBAL__sub_I_eh_alloc.cc (eh_alloc.cc:456)
+    n1: 73728 0x4005436: call_init (dl-init.c:74)
+     n1: 73728 0x4005436: call_init (dl-init.c:26)
+      n1: 73728 0x400552C: _dl_init (dl-init.c:121)
+       n0: 73728 0x401D1DF: ??? (in /usr/lib64/ld-linux-x86-64.so.2)
+ n1: 1024 0x51DA0A6: _IO_file_doallocate (filedoalloc.c:101)
+  n1: 1024 0x51E9413: _IO_doallocbuf (genops.c:347)
+   n1: 1024 0x51E9413: _IO_doallocbuf (genops.c:342)
+    n1: 1024 0x51E74C7: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+     n1: 1024 0x51E7FE7: _IO_new_file_xsputn (fileops.c:1244)
+      n1: 1024 0x51E7FE7: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+       n1: 1024 0x51DB782: fwrite (iofwrite.c:39)
+        n1: 1024 0x4F2A2DC: sputn (streambuf:458)
+         n1: 1024 0x4F2A2DC: __ostream_write<char, std::char_traits<char> > (ostream_insert.h:53)
+          n1: 1024 0x4F2A2DC: std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long) (ostream_insert.h:104)
+           n1: 1024 0x4F2A64A: std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*) (ostream:673)
+            n0: 1024 0x4022E4: main (main.cpp:51)
+ n0: 128 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=6
+#-----------
+time=4290406
+mem_heap_B=1152
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=4292567
+mem_heap_B=128
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
