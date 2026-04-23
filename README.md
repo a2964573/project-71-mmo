@@ -36,6 +36,14 @@
   - **Refactoring:** 소멸자 내 불필요한 초기화(C 스타일)를 완전히 제거하고, C++의 자동 메모리 관리 철학에 집중.
 - **Artifact:** `day3_weak_ptr_circular_fix.cpp`
 
+### [Day 4] Multi-threading & Synchronization (2026-04-24)
+- **Focus:** 멀티스레드 환경에서의 데이터 경합(Data Race) 진단 및 `std::mutex`를 이용한 스레드 동기화(Synchronization).
+- **Key Learnings:**
+  - `std::thread`를 활용한 동시성(Concurrency) 로직 구현 (Lambda 및 멤버 함수 포인터 활용).
+  - 공유 자원(`pos`)에 대한 병렬 접근 시 발생하는 Lost Update(데이터 유실) 현상을 코드로 직접 유발하여 원인 분석.
+  - `std::lock_guard`의 RAII 패턴을 활용하여 임계 구역(Critical Section)을 스코프 단위로 안전하게 락킹(Locking)하고 데드락(Deadlock)을 예방하는 구조 설계.
+- **Artifact:** `day4_mutex_data_race.cpp`
+
 ---
 
 ## Tech Stack (Evolution)

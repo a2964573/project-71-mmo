@@ -8,11 +8,15 @@ class Monster
 	public:
 		std::string name;
 		std::shared_ptr<Party> party;
+		int pos;
+
+		std::mutex mtx;
 
 		Monster(std::string value)
 		{
 			name  = value;
 			party = nullptr;
+			pos   = 0;
 			std::cout << "Monster '" << value << "' Create!" << std::endl;
 		}
 
@@ -21,6 +25,7 @@ class Monster
 			std::cout << "Destroy Monster..." << std::endl;
 			name  = "";
 			party = nullptr;
+			pos   = 0;
 		}
 
 		void setMonsterParty(std::shared_ptr<Party> ptr)
@@ -33,6 +38,24 @@ class Monster
 		{
 			std::cout << "Get Monster Name.[" << name << "]" << std::endl;
 			return name;
+		}
+
+		int integrationPos()
+		{
+			int loop_cnt = 10000;
+			int idx;
+
+			// Mutex Lock /////////////////////////////////
+			{
+				std::lock_guard<std::mutex> lock(mtx);
+				for(idx = 0; idx < loop_cnt; idx++) {
+					pos++;
+				}
+			}
+			///////////////////////////////////////////////
+			std::cout << "integrationPos.[" << pos << "]" << std::endl;
+
+			return pos;
 		}
 };
 
@@ -96,6 +119,18 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		// lambda
+		std::thread worker1([orc]() {
+			orc->integrationPos();
+		});
+
+		// standard
+		std::thread worker2(&Monster::integrationPos, orc);
+		
+		worker1.join();
+		worker2.join();
+
+		std::cout << "orc pos [" << orc->pos << "]" << std::endl;
 		std::cout << "--- [Inner Scope End  ] ---" << std::endl;
 	}
 	std::cout << "--- [Main Scope End  ] ---" << std::endl;
