@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -lssl -lcrypto -g
+CXXFLAGS = -Wall -lssl -lcrypto -g -std=c++20
 
 BUILDDIR = build
 APPLYDIR = application

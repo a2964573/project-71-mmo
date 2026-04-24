@@ -8,7 +8,7 @@ class Monster
 	public:
 		std::string name;
 		std::shared_ptr<Party> party;
-		int pos;
+		std::atomic<int> pos;
 
 		std::mutex mtx;
 
@@ -47,13 +47,13 @@ class Monster
 
 			// Mutex Lock /////////////////////////////////
 			{
-				std::lock_guard<std::mutex> lock(mtx);
+//				std::lock_guard<std::mutex> lock(mtx);
 				for(idx = 0; idx < loop_cnt; idx++) {
 					pos++;
 				}
 			}
 			///////////////////////////////////////////////
-			std::cout << "integrationPos.[" << pos << "]" << std::endl;
+			std::osyncstream(std::cout) << "integrationPos.[" << pos << "]" << std::endl;
 
 			return pos;
 		}

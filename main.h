@@ -5,6 +5,8 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <atomic>
+#include <syncstream>
 
 #endif // _MAIN_H_
 
