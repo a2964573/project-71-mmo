@@ -4,16 +4,23 @@ CXXFLAGS = -Wall -lssl -lcrypto -g -std=c++20
 BUILDDIR = build
 APPLYDIR = application
 
-OBJS =  $(BUILDDIR)/main.o \
+OBJS = \
+	$(BUILDDIR)/conv.o
+#	$(BUILDDIR)/main.o
 
-TARGET = Uniqueptr
+TARGET = execute
 
-all: main
+all: conv
 
 main: main.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
 	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
 	$(CXX) $(CXXFLAGS) -c main.cpp -o $(BUILDDIR)/main.o
+
+conv: conv.cpp
+	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
+	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
+	$(CXX) $(CXXFLAGS) -c conv.cpp -o $(BUILDDIR)/conv.o
 
 clean:
 	rm -f $(OBJS)

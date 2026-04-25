@@ -7,6 +7,9 @@
 #include <mutex>
 #include <atomic>
 #include <syncstream>
+#include <queue>
+#include <chrono>
+#include <condition_variable>
 
 #endif // _MAIN_H_
 
