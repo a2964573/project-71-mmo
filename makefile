@@ -4,13 +4,13 @@ CXXFLAGS = -Wall -lssl -lcrypto -g -std=c++20
 BUILDDIR = build
 APPLYDIR = application
 
+#	$(BUILDDIR)/conv.o
 OBJS = \
-	$(BUILDDIR)/conv.o
-#	$(BUILDDIR)/main.o
+	$(BUILDDIR)/main.o
 
 TARGET = execute
 
-all: conv
+all: main
 
 main: main.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi

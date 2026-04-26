@@ -60,6 +60,14 @@
   - 서버 프로세스 종료 시 워커 스레드들이 큐에 남은 잔여 작업을 모두 처리하고 안전하게 종료되도록 유도하는 Graceful Shutdown 검증 완료.
 - **Artifact:** `day6_condition_variable.cpp`
 
+### [Day 7] Deadlock Prevention & std::scoped_lock (2026-04-27)
+- **Focus:** 멀티스레드 환경의 교착 상태(Deadlock) 및 라이브락(Livelock) 진단, RAII 기반의 다중 락 획득 최적화.
+- **Key Learnings:**
+  - 두 객체가 서로의 자원을 교차로 요구할 때 발생하는 '환형 대기(Circular Wait)' 현상을 코드로 직접 유발하여 로직의 멈춤 현상 확인.
+  - `try_lock`과 `std::thread::id`를 활용한 커스텀 Mutex 방어 로직 설계로 동시성 디버깅 역량 강화.
+  - C++17 표준인 `std::scoped_lock`을 도입하여, 메모리 주소 기반 정렬 알고리즘을 통해 데드락을 원천 차단하고 수동 `unlock()`에 의한 휴먼 에러(미정의 동작)를 방지하는 Modern C++ 스레드 세이프 아키텍처 완성.
+- **Artifact:** `day7_scoped_lock_deadlock_fix.cpp`
+
 ---
 
 ## Tech Stack (Evolution)

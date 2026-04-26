@@ -3,6 +3,73 @@
 class Monster;
 class Party;
 
+class Party
+{
+	public:
+		std::string name;
+		std::weak_ptr<Monster> mon;
+
+		std::mutex mtx;
+		std::thread::id mtx_id;
+
+		Party(std::string value)
+		{
+			name = value;
+			std::cout << "Create Party [" << name << "]" << std::endl;
+		}
+
+		~Party()
+		{
+			std::cout << "Destroy Party..." << std::endl;
+			name = "";
+//			mtx.unlock();
+		}
+
+		void setPartyMonster(std::weak_ptr<Monster> ptr)
+		{
+			std::cout << "Set Party Monster." << std::endl;
+			mon = ptr;
+		}
+
+		std::string getPartyName()
+		{
+			std::cout << "Get Party Name.[" << name << "]" << std::endl;
+			return name;
+		}
+
+		int lockPartyMutex()
+		{
+			if(mtx.try_lock() == false) {
+				std::cout << name << ": Mutex Already Lock..." << std::endl;
+
+				std::thread::id crnt_id = std::this_thread::get_id();
+				if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
+					std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
+					return -1;
+				}
+
+				return 0;
+			}
+
+			mtx_id = std::this_thread::get_id();
+			std::cout << name << ": Mutex Lock" << std::endl;
+			return 0;
+		}
+
+		int unlockPartyMutex()
+		{
+			std::thread::id crnt_id = std::this_thread::get_id();
+			if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
+				std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
+				return -1;
+			}
+
+			mtx.unlock();
+			std::cout << name << ": Mutex Unlock" << std::endl;
+			return 0;
+		}
+};
+
 class Monster
 {
 	public:
@@ -11,6 +78,7 @@ class Monster
 		std::atomic<int> pos;
 
 		std::mutex mtx;
+		std::thread::id mtx_id;
 
 		Monster(std::string value)
 		{
@@ -26,6 +94,7 @@ class Monster
 			name  = "";
 			party = nullptr;
 			pos   = 0;
+			mtx.unlock();
 		}
 
 		void setMonsterParty(std::shared_ptr<Party> ptr)
@@ -38,6 +107,39 @@ class Monster
 		{
 			std::cout << "Get Monster Name.[" << name << "]" << std::endl;
 			return name;
+		}
+
+		int lockMonsterMutex()
+		{
+			if(mtx.try_lock() == false) {
+				std::cout << name << ": Mutex Already Lock..." << std::endl;
+
+				std::thread::id crnt_id = std::this_thread::get_id();
+				if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
+					std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
+					return -1;
+				}
+
+				return 0;
+			}
+
+			mtx_id = std::this_thread::get_id();
+			std::cout << name << ": Mutex Lock" << std::endl;
+			return 0;
+		}
+
+		int unlockMonsterMutex()
+		{
+			std::thread::id crnt_id = std::this_thread::get_id();
+			if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
+				std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
+				return -1;
+			}
+
+			mtx.unlock();
+			std::cout << name << ": Mutex Unlock" << std::endl;
+
+			return 0;
 		}
 
 		int integrationPos()
@@ -57,39 +159,19 @@ class Monster
 
 			return pos;
 		}
-};
 
-class Party
-{
-	public:
-		std::string name;
-		std::weak_ptr<Monster> mon;
-
-		Party(std::string value)
+		int proccedure(std::shared_ptr<Party> other)
 		{
-			name = value;
-			std::cout << "Create Party [" << name << "]" << std::endl;
-		}
+//			party->lockPartyMutex();
+//			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//			other->lockPartyMutex();
 
-		~Party()
-		{
-			std::cout << "Destroy Party..." << std::endl;
-			name = "";
-		}
+			std::scoped_lock lock(party->mtx, other->mtx);
+			std::cout << name << ": Mutexlock Success!" << std::endl;
 
-		void setPartyMonster(std::weak_ptr<Monster> ptr)
-		{
-			std::cout << "Set Party Monster." << std::endl;
-			mon = ptr;
-		}
-
-		std::string getPartyName()
-		{
-			std::cout << "Get Party Name.[" << name << "]" << std::endl;
-			return name;
+			return 0;
 		}
 };
-
 
 int main(int argc, char *argv[])
 {
@@ -98,39 +180,22 @@ int main(int argc, char *argv[])
 		std::cout << "--- [Inner Scope Start] ---" << std::endl;
 
 		auto orc   = std::make_shared<Monster>("orc");
-		auto party = std::make_shared<Party>("mario_party");
+		auto goblin= std::make_shared<Monster>("goblin");
 
-		orc->setMonsterParty(party);
-		party->setPartyMonster(orc);
+		auto party1= std::make_shared<Party>("party1");
+		auto party2= std::make_shared<Party>("party2");
 
-		if(party->mon.expired() == true) {
-			std::cout << "Party weak_ptr mon is died..." << std::endl;
-		}
-		else {
-			std::cout << "Party weak_ptr mon is alive." << std::endl;
+		orc->setMonsterParty(party1);
+		goblin->setMonsterParty(party2);
 
-			std::shared_ptr<Monster> s_monster_ptr = party->mon.lock();
-			if(s_monster_ptr == nullptr) {
-				std::cout << "s_monster_ptr is nullptr..." << std::endl;
-			}
-			else {
-				std::cout << "s_monster_ptr is shared_ptr." << std::endl;
-				s_monster_ptr->getMonsterName();
-			}
-		}
+		// Mutex Lock //////////////////////////////////////////////
+		std::thread worker1(&Monster::proccedure, orc, party2);
+		std::thread worker2(&Monster::proccedure, goblin, party1);
 
-		// lambda
-		std::thread worker1([orc]() {
-			orc->integrationPos();
-		});
-
-		// standard
-		std::thread worker2(&Monster::integrationPos, orc);
-		
 		worker1.join();
 		worker2.join();
+		////////////////////////////////////////////////////////////
 
-		std::cout << "orc pos [" << orc->pos << "]" << std::endl;
 		std::cout << "--- [Inner Scope End  ] ---" << std::endl;
 	}
 	std::cout << "--- [Main Scope End  ] ---" << std::endl;
