@@ -1,205 +1,71 @@
 #include "main.h"
 
-class Monster;
-class Party;
+#define PORT 8080
 
-class Party
+int proccedure(int client_socket)
 {
-	public:
-		std::string name;
-		std::weak_ptr<Monster> mon;
+	int  read_bytes   = 0;
+	char buffer[1024] = {0,};
+	const char* response = "Welcome to the Server!";
 
-		std::mutex mtx;
-		std::thread::id mtx_id;
-
-		Party(std::string value)
-		{
-			name = value;
-			std::cout << "Create Party [" << name << "]" << std::endl;
+	while( true ) {
+		memset(buffer, 0x00, sizeof(buffer));
+		read_bytes = read(client_socket, buffer, sizeof(buffer));
+		if( read_bytes <= 0 ) {
+			std::cout << "  read len zero. " << std::endl;
+			break;
 		}
+		std::cout << "  $ [" << std::this_thread::get_id() << "][" << client_socket << "]: " << buffer << std::endl;
 
-		~Party()
-		{
-			std::cout << "Destroy Party..." << std::endl;
-			name = "";
-//			mtx.unlock();
-		}
-
-		void setPartyMonster(std::weak_ptr<Monster> ptr)
-		{
-			std::cout << "Set Party Monster." << std::endl;
-			mon = ptr;
-		}
-
-		std::string getPartyName()
-		{
-			std::cout << "Get Party Name.[" << name << "]" << std::endl;
-			return name;
-		}
-
-		int lockPartyMutex()
-		{
-			if(mtx.try_lock() == false) {
-				std::cout << name << ": Mutex Already Lock..." << std::endl;
-
-				std::thread::id crnt_id = std::this_thread::get_id();
-				if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
-					std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
-					return -1;
-				}
-
-				return 0;
-			}
-
-			mtx_id = std::this_thread::get_id();
-			std::cout << name << ": Mutex Lock" << std::endl;
-			return 0;
-		}
-
-		int unlockPartyMutex()
-		{
-			std::thread::id crnt_id = std::this_thread::get_id();
-			if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
-				std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
-				return -1;
-			}
-
-			mtx.unlock();
-			std::cout << name << ": Mutex Unlock" << std::endl;
-			return 0;
-		}
-};
-
-class Monster
-{
-	public:
-		std::string name;
-		std::shared_ptr<Party> party;
-		std::atomic<int> pos;
-
-		std::mutex mtx;
-		std::thread::id mtx_id;
-
-		Monster(std::string value)
-		{
-			name  = value;
-			party = nullptr;
-			pos   = 0;
-			std::cout << "Monster '" << value << "' Create!" << std::endl;
-		}
-
-		~Monster()
-		{
-			std::cout << "Destroy Monster..." << std::endl;
-			name  = "";
-			party = nullptr;
-			pos   = 0;
-			mtx.unlock();
-		}
-
-		void setMonsterParty(std::shared_ptr<Party> ptr)
-		{
-			std::cout << "Set Monster Party." << std::endl;
-			party = ptr;
-		}
-
-		std::string getMonsterName()
-		{
-			std::cout << "Get Monster Name.[" << name << "]" << std::endl;
-			return name;
-		}
-
-		int lockMonsterMutex()
-		{
-			if(mtx.try_lock() == false) {
-				std::cout << name << ": Mutex Already Lock..." << std::endl;
-
-				std::thread::id crnt_id = std::this_thread::get_id();
-				if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
-					std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
-					return -1;
-				}
-
-				return 0;
-			}
-
-			mtx_id = std::this_thread::get_id();
-			std::cout << name << ": Mutex Lock" << std::endl;
-			return 0;
-		}
-
-		int unlockMonsterMutex()
-		{
-			std::thread::id crnt_id = std::this_thread::get_id();
-			if(mtx_id != std::thread::id() && crnt_id != mtx_id) {
-				std::cerr << name << ": other's Lock...[" << crnt_id << ":" << mtx_id << "]" << std::endl;
-				return -1;
-			}
-
-			mtx.unlock();
-			std::cout << name << ": Mutex Unlock" << std::endl;
-
-			return 0;
-		}
-
-		int integrationPos()
-		{
-			int loop_cnt = 10000;
-			int idx;
-
-			// Mutex Lock /////////////////////////////////
-			{
-//				std::lock_guard<std::mutex> lock(mtx);
-				for(idx = 0; idx < loop_cnt; idx++) {
-					pos++;
-				}
-			}
-			///////////////////////////////////////////////
-			std::osyncstream(std::cout) << "integrationPos.[" << pos << "]" << std::endl;
-
-			return pos;
-		}
-
-		int proccedure(std::shared_ptr<Party> other)
-		{
-//			party->lockPartyMutex();
-//			std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//			other->lockPartyMutex();
-
-			std::scoped_lock lock(party->mtx, other->mtx);
-			std::cout << name << ": Mutexlock Success!" << std::endl;
-
-			return 0;
-		}
-};
-
-int main(int argc, char *argv[])
-{
-	std::cout << "--- [Main Scope Start] ---" << std::endl;
-	{
-		std::cout << "--- [Inner Scope Start] ---" << std::endl;
-
-		auto orc   = std::make_shared<Monster>("orc");
-		auto goblin= std::make_shared<Monster>("goblin");
-
-		auto party1= std::make_shared<Party>("party1");
-		auto party2= std::make_shared<Party>("party2");
-
-		orc->setMonsterParty(party1);
-		goblin->setMonsterParty(party2);
-
-		// Mutex Lock //////////////////////////////////////////////
-		std::thread worker1(&Monster::proccedure, orc, party2);
-		std::thread worker2(&Monster::proccedure, goblin, party1);
-
-		worker1.join();
-		worker2.join();
-		////////////////////////////////////////////////////////////
-
-		std::cout << "--- [Inner Scope End  ] ---" << std::endl;
+		send(client_socket, response, strlen(response), 0);
 	}
-	std::cout << "--- [Main Scope End  ] ---" << std::endl;
 
+	close(client_socket);
+	return 0;
+}
+
+int main()
+{
+	int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if( server_fd == 0 ) {
+		std::cerr << "create socket failed." << std::endl;
+		return -1;
+	}
+
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons(PORT);
+
+	if( bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0 ) {
+		std::cerr << "bind failed." << std::endl;
+		return -1;
+	}
+
+	if( listen(server_fd, 3) < 0 ) {
+		std::cerr << "listen failed." << std::endl;
+		return -1;
+	}
+	std::cout << "--- server start. port[" << PORT << "] wait..." << std::endl;
+
+	int addrlen;
+	int client_socket;
+
+	while( true ) {
+		addrlen = sizeof(address);
+		client_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
+		if( client_socket < 0 ) {
+			std::cerr << "accept failed." << std::endl;
+			break;
+		}
+		std::cout << "  client connect success!" << std::endl;
+
+		std::thread t(proccedure, client_socket);
+		t.detach();
+	}
+
+	close(server_fd);
+	std::cout << "--- server end. ---" << std::endl;
 	return 0;
 }
 

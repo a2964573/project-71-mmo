@@ -10,6 +10,10 @@
 #include <queue>
 #include <chrono>
 #include <condition_variable>
+#include <cstring>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
 #endif // _MAIN_H_
 
