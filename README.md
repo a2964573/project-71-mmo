@@ -77,6 +77,14 @@
   - 1:1 스레드 모델이 대규모 트래픽(C10K)에서 유발하는 스택 메모리 고갈 및 컨텍스트 스위칭 비용을 인지하고, 이벤트 기반 아키텍처로의 전환 당위성 도출.
 - **Artifact:** `day8_multithread_tcp_server.cpp`
 
+### [Day 9] I/O Multiplexing & Epoll Event Loop (2026-04-29)
+- **Focus:** 리눅스 커널 수준의 이벤트 통지 모델(`epoll`)을 활용한 싱글 스레드 비동기 서버 아키텍처 구현.
+- **Key Learnings:**
+  - `epoll_create1`, `epoll_ctl`, `epoll_wait` 시스템 콜의 구조적 결합 및 이벤트 바구니(`epoll_event` 배열)의 작동 원리 이해.
+  - 다중 클라이언트 접속 시, 단 1개의 메인 스레드(Thread ID 단일성 검증 완료)가 블로킹(Blocking) 없이 수십 개의 소켓(FD) 입출력을 순차적으로 처리하는 Non-Blocking 제어 직접 증명.
+  - 클라이언트 접속 비정상 종료 시 발생할 수 있는 `SIGPIPE` 크래시 위험성을 인지하고, `EPOLL_CTL_DEL` 및 조기 반환(`early return`)을 통한 안전한 소켓 해제 패턴 습득.
+- **Artifact:** `day9_epoll_echo_server.cpp`
+
 ---
 
 ## Tech Stack (Evolution)

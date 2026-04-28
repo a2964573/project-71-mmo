@@ -1,26 +1,23 @@
 #include "main.h"
 
 #define PORT 8080
+#define MAX_EVENTS 10
 
-int proccedure(int client_socket)
+int procedure(int client_socket)
 {
 	int  read_bytes   = 0;
 	char buffer[1024] = {0,};
-	const char* response = "Welcome to the Server!";
 
-	while( true ) {
-		memset(buffer, 0x00, sizeof(buffer));
-		read_bytes = read(client_socket, buffer, sizeof(buffer));
-		if( read_bytes <= 0 ) {
-			std::cout << "  read len zero. " << std::endl;
-			break;
-		}
-		std::cout << "  $ [" << std::this_thread::get_id() << "][" << client_socket << "]: " << buffer << std::endl;
-
-		send(client_socket, response, strlen(response), 0);
+	read_bytes = read(client_socket, buffer, sizeof(buffer));
+	if( read_bytes <= 0 ) {
+		std::cout << "  read len zero. " << std::endl;
+		close(client_socket);
+		return -1;
 	}
+	std::cout << "  $ [" << std::this_thread::get_id() << "][" << client_socket << "]: " << buffer << std::endl;
 
-	close(client_socket);
+	send(client_socket, buffer, strlen(buffer), 0);
+
 	return 0;
 }
 
@@ -42,26 +39,45 @@ int main()
 		return -1;
 	}
 
-	if( listen(server_fd, 3) < 0 ) {
+	if( listen(server_fd, SOMAXCONN) < 0 ) {
 		std::cerr << "listen failed." << std::endl;
 		return -1;
 	}
-	std::cout << "--- server start. port[" << PORT << "] wait..." << std::endl;
 
-	int addrlen;
+	int epoll_fd = epoll_create1(0);
+	struct epoll_event event;
+	struct epoll_event events[MAX_EVENTS];
+
+	event.events = EPOLLIN;
+	event.data.fd = server_fd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event);
+
+	std::cout << "--- server start. port[" << PORT << "]" << std::endl;
+
+	int i;
+	int num_ready;
 	int client_socket;
-
 	while( true ) {
-		addrlen = sizeof(address);
-		client_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
-		if( client_socket < 0 ) {
-			std::cerr << "accept failed." << std::endl;
-			break;
-		}
-		std::cout << "  client connect success!" << std::endl;
+		num_ready = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 
-		std::thread t(proccedure, client_socket);
-		t.detach();
+		for(i = 0; i < num_ready; i++) {
+			if(events[i].data.fd == server_fd) {
+				client_socket = accept(server_fd, NULL, NULL);
+				if( client_socket < 0 ) {
+					std::cerr << "accept failed." << std::endl;
+					break;
+				}
+				std::cout << "  client connect success!" << std::endl;
+
+				event.events = EPOLLIN;
+				event.data.fd = client_socket;
+				epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event);
+			}
+			else {
+				client_socket = events[i].data.fd;
+				procedure(client_socket);
+			}
+		}
 	}
 
 	close(server_fd);
