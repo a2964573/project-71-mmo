@@ -85,6 +85,14 @@
   - 클라이언트 접속 비정상 종료 시 발생할 수 있는 `SIGPIPE` 크래시 위험성을 인지하고, `EPOLL_CTL_DEL` 및 조기 반환(`early return`)을 통한 안전한 소켓 해제 패턴 습득.
 - **Artifact:** `day9_epoll_echo_server.cpp`
 
+### [Day 11] Reactor Pattern Architecture (2026-05-01)
+- **Focus:** Epoll(Event Loop)과 Thread Pool(Worker)을 결합한 Reactor 패턴 서버 구현.
+- **Key Learnings:**
+  - `detach()`를 활용한 독립적인 워커 스레드 풀(Thread Pool) 백그라운드 구동.
+  - 메인 스레드는 `epoll`을 통한 Non-blocking I/O 접수만 담당하고, 실제 연산 및 송신(`send`)은 워커 스레드가 전담하도록 역할(Concern) 분리.
+  - `std::unique_lock`과 `std::condition_variable`을 이용해 큐에 작업이 들어왔을 때만 워커 스레드를 기상시키는 고효율 동기화 및 가짜 기상(Spurious Wakeup) 방어 검증 완료.
+- **Artifact:** `day11_reactor_server.cpp`
+
 ---
 
 ## Tech Stack (Evolution)
