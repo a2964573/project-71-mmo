@@ -6,12 +6,13 @@ APPLYDIR = application
 
 #	$(BUILDDIR)/conv.o
 #	$(BUILDDIR)/main.o
+#	$(BUILDDIR)/reactor.o
 OBJS = \
-	$(BUILDDIR)/reactor.o
+	$(BUILDDIR)/netpack.o
 
 TARGET = execute
 
-all: reactor
+all: netpack 
 
 main: main.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
@@ -27,6 +28,12 @@ reactor: reactor.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
 	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
 	$(CXX) $(CXXFLAGS) -c reactor.cpp -o $(BUILDDIR)/reactor.o
+
+netpack: netpack.cpp
+	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
+	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
+	$(CXX) $(CXXFLAGS) -c netpack.cpp -o $(BUILDDIR)/netpack.o
+
 clean:
 	rm -f $(OBJS)
 

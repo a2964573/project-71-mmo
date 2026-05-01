@@ -93,6 +93,15 @@
   - `std::unique_lock`과 `std::condition_variable`을 이용해 큐에 작업이 들어왔을 때만 워커 스레드를 기상시키는 고효율 동기화 및 가짜 기상(Spurious Wakeup) 방어 검증 완료.
 - **Artifact:** `day11_reactor_server.cpp`
 
+### [Day 12] Packet Serialization & TCP Framing (2026-05-02)
+- **Focus:** C++ 구조체 기반의 바이너리 패킷 직렬화 및 TCP 스트림 프레이밍(Framing) 구현.
+- **Key Learnings:**
+  - `#pragma pack`을 활용한 메모리 정렬(Memory Alignment) 제어 및 패딩 쓰레기값 방어.
+  - `reinterpret_cast`를 이용한 Zero-cost 직렬화/역직렬화 기법 적용.
+  - 공통 헤더(Size/ID) 구조를 설계하고, 오프셋(`offset`) 기반의 `while` 루프를 구축하여 뭉쳐진 TCP 바이트 스트림(Sticky Packet)을 개별 패킷으로 완벽하게 분할(Parsing) 성공.
+  - 텍스트(JSON) 기반 통신 대비 바이너리 프로토콜이 가지는 압도적인 네트워크 대역폭 및 CPU 연산 이점 분석.
+- **Artifact:** `day12_packet_parser.cpp`
+
 ---
 
 ## Tech Stack (Evolution)
