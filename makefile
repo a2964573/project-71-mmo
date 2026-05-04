@@ -8,11 +8,11 @@ APPLYDIR = application
 #	$(BUILDDIR)/main.o
 #	$(BUILDDIR)/reactor.o
 OBJS = \
-	$(BUILDDIR)/netpack.o
+	$(BUILDDIR)/main.o
 
-TARGET = execute
+TARGET = main
 
-all: netpack 
+all: main
 
 main: main.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
@@ -33,6 +33,11 @@ netpack: netpack.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
 	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
 	$(CXX) $(CXXFLAGS) -c netpack.cpp -o $(BUILDDIR)/netpack.o
+
+client: client.cpp
+	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
+	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
+	$(CXX) $(CXXFLAGS) -c client.cpp -o $(BUILDDIR)/client.o
 
 clean:
 	rm -f $(OBJS)

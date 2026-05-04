@@ -102,6 +102,14 @@
   - 텍스트(JSON) 기반 통신 대비 바이너리 프로토콜이 가지는 압도적인 네트워크 대역폭 및 CPU 연산 이점 분석.
 - **Artifact:** `day12_packet_parser.cpp`
 
+### [Day 13] Reactor + Parser Integration & Session Buffer (2026-05-03)
+- **Focus:** Epoll 반응기(Reactor)와 패킷 파서(Parser)의 결합 및 세션 버퍼(Session Buffer) 아키텍처 구축.
+- **Key Learnings:**
+  - TCP 단편화(Fragmentation) 및 뭉침(Sticky Packet) 현상으로부터 멀티스레드 환경을 보호하기 위한 유저별 전용 `Session Buffer (std::vector<char>)` 도입.
+  - 메인 스레드(Epoll)는 세션 버퍼에 스트림을 누적하고 완전한 패킷만 잘라(Parsing) 큐에 삽입함으로써, 워커 스레드에게 파싱의 부담과 오류를 제거.
+  - 책갈피(`offset`) 이동 누락 시 발생하는 무한 루프(Infinite Loop) 버그를 직접 트러블슈팅하며 안전한 버퍼 절삭(`erase`) 로직 체득.
+- **Artifact:** `day13_integrated_server_core.cpp`
+
 ---
 
 ## Tech Stack (Evolution)
