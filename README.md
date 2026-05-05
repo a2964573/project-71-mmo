@@ -110,6 +110,14 @@
   - 책갈피(`offset`) 이동 누락 시 발생하는 무한 루프(Infinite Loop) 버그를 직접 트러블슈팅하며 안전한 버퍼 절삭(`erase`) 로직 체득.
 - **Artifact:** `day13_integrated_server_core.cpp`
 
+### [Day 14] Packet Dispatcher & Broadcasting (2026-05-04)
+- **Focus:** 패킷 ID 기반 라우팅(Dispatcher) 및 다중 클라이언트 상태 동기화(Broadcasting) 구현.
+- **Key Learnings:**
+  - `switch-case`를 활용한 패킷 디스패처 패턴을 도입하여, Worker 스레드의 역할을 '연산자'에서 '라우터(Router)'로 분리 및 모듈화.
+  - `std::unordered_set`과 전용 동기화 락(`std::mutex`)을 활용한 Thread-safe 접속자 명부(Session Manager) 구축.
+  - 접속 중인 모든 클라이언트에게 패킷을 복제하여 전송하는 브로드캐스팅 로직을 구현하고, 더미 클라이언트와 Netcat을 이용해 바이너리 데이터의 공간 동기화(Sync) 성공적 검증.
+- **Artifact:** `day14_broadcasting_server.cpp`
+
 ---
 
 ## Tech Stack (Evolution)

@@ -25,7 +25,37 @@ std::condition_variable cv;
 
 std::unordered_map<int, std::vector<char>> session_buffers;
 
-void worker_logic(int worker_id)
+std::unordered_set<int> active_clients;
+std::mutex client_mtx;
+
+int Broadcast(char* data, int size, int sender_fd)
+{
+	std::lock_guard<std::mutex> lock(client_mtx);
+
+	int rtn =  0;
+	for(int fd : active_clients) {
+		if(sender_fd == fd) {
+			continue;
+		}
+
+		rtn = send(fd, data, size, 0);
+		if(rtn <= 0) {
+			std::cout << "  [Warning] Broadcast sended failed: " << fd << ", " << rtn << std::endl;
+		}
+	}
+
+	return 0;
+}
+
+void HandleMovePacket(int client_socket, char* data, int size)
+{
+	MovePacket* mov_pkt = reinterpret_cast<MovePacket*>(data);
+	std::cout << "  [Dispatcher] FD " << client_socket << " move X: " << mov_pkt->x << ", Y: " << mov_pkt->y << std::endl;
+
+	Broadcast(data, size, client_socket);
+}
+
+int worker_logic(int worker_id)
 {
     while(true) {
         Job crnt_job;
@@ -36,19 +66,22 @@ void worker_logic(int worker_id)
             crnt_job = job_que.front();
             job_que.pop();
         }
-        
-		if(crnt_job.packet_id == 1) {
-			MovePacket* mov_pkt = reinterpret_cast<MovePacket*>(crnt_job.packet_data.data());
 
-			std::cout << "  [Worker " << worker_id << "] complate! FD: " << crnt_job.client_socket
-				<< " X: " << mov_pkt->x << ", "
-				<< " Y: " << mov_pkt->y << "\n" << std::flush;
-		
-			send(crnt_job.client_socket, crnt_job.packet_data.data(), crnt_job.packet_data.size(), 0);
+		switch(crnt_job.packet_id) {
+			case 1:
+			{
+				HandleMovePacket(crnt_job.client_socket, crnt_job.packet_data.data(), crnt_job.packet_data.size());
+			}
+			break;
+			default:
+			{
+				std::cout << "  [Warning] Unkown Packet ID: " << crnt_job.packet_id << std::endl;
+			}
+			break;
 		}
     }
     
-    return;
+    return 0;
 }
 
 int procedure(int epoll_fd, int client_socket)
@@ -61,6 +94,12 @@ int procedure(int epoll_fd, int client_socket)
         std::cout << "  read len zero. " << std::endl;
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, NULL);
         close(client_socket);
+		session_buffers.erase(client_socket);
+
+		{
+			std::lock_guard<std::mutex> lock(client_mtx);
+			active_clients.erase(client_socket);
+		}
         return -1;
     }
     std::cout << "  $ [" << std::this_thread::get_id() << "][" << client_socket << "]: " << buffer << std::endl;
@@ -151,6 +190,11 @@ int main()
                 std::cout << "  client connect success!" << std::endl;
 
 				session_buffers[client_socket] = std::vector<char>();
+
+				{
+					std::lock_guard<std::mutex> lock(client_mtx);
+					active_clients.insert(client_socket);
+				}
 
                 event.events = EPOLLIN;
                 event.data.fd = client_socket;

@@ -8,11 +8,11 @@ APPLYDIR = application
 #	$(BUILDDIR)/main.o
 #	$(BUILDDIR)/reactor.o
 OBJS = \
-	$(BUILDDIR)/main.o
+	$(BUILDDIR)/client.o
 
-TARGET = main
+TARGET = client
 
-all: main
+all: client
 
 main: main.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
