@@ -118,6 +118,15 @@
   - 접속 중인 모든 클라이언트에게 패킷을 복제하여 전송하는 브로드캐스팅 로직을 구현하고, 더미 클라이언트와 Netcat을 이용해 바이너리 데이터의 공간 동기화(Sync) 성공적 검증.
 - **Artifact:** `day14_broadcasting_server.cpp`
 
+### [Day 15] Object-Oriented Architecture & Encapsulation (2026-05-05)
+- **Focus:** 전역 상태(Global State) 제거 및 `GameServer` 클래스 기반의 완벽한 객체지향 리팩토링.
+- **Key Learnings:**
+  - C++ 멀티스레딩 환경에서 클래스 멤버 함수를 스레드에 할당하는 문법 (`&ClassName::Method, this`) 마스터.
+  - 조건 변수(Condition Variable) 람다식 내부에서의 객체 포인터(`[this]`) 캡처 원리 이해.
+  - C++ ODR(One Definition Rule)을 준수하기 위한 헤더(`/h`)와 구현부(`.cpp`) 파일의 완벽한 분리 및 생성자 중복 정의(Redefinition) 트러블슈팅.
+  - 독립적인 인스턴스화가 가능한 '서버 모듈(Engine)' 설계 완료.
+- **Artifact:** `main.h`, `class.cpp` (Fully Encapsulated Game Server Core)
+
 ---
 
 ## Tech Stack (Evolution)

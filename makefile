@@ -4,14 +4,14 @@ CXXFLAGS = -Wall -lssl -lcrypto -g -std=c++20
 BUILDDIR = build
 APPLYDIR = application
 
-#	$(BUILDDIR)/conv.o
-#	$(BUILDDIR)/main.o
-#	$(BUILDDIR)/reactor.o
 OBJS = \
 	$(BUILDDIR)/client.o
+#	$(BUILDDIR)/class.o \
+#	$(BUILDDIR)/main.o
 
 TARGET = client
 
+# all: class main
 all: client
 
 main: main.cpp
@@ -38,6 +38,11 @@ client: client.cpp
 	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
 	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
 	$(CXX) $(CXXFLAGS) -c client.cpp -o $(BUILDDIR)/client.o
+
+class: class.cpp
+	@if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
+	@if [ ! -d $(APPLYDIR) ]; then mkdir -p $(APPLYDIR); fi
+	$(CXX) $(CXXFLAGS) -c class.cpp -o $(BUILDDIR)/class.o
 
 clean:
 	rm -f $(OBJS)
